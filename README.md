@@ -1,6 +1,17 @@
-﻿# Agentic API Security Proxy
+# Agentic API Security Proxy
+
+[![Continuous Integration](https://github.com/rohanbuilds-ai/agentic-api-security-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/rohanbuilds-ai/agentic-api-security-proxy/actions/workflows/ci.yml)
 
 An inline, fail-closed runtime API security gateway positioned between autonomous AI agents and protected backend services/databases.
+
+### Project Summary for Reviewers & Recruiters
+This repository implements a lightweight, deterministic application security proxy engineered for AI-agent tool-calling and autonomous API interactions:
+- **Runtime Security Proxy for AI-Agent API Actions**: Intercepts, validates, and authorizes action requests before forwarding to upstream services.
+- **Deterministic RBAC and Tenant Isolation**: Resolves trusted server-side agent identity, enforces strict role-based access control, and prevents Broken Object Level Authorization (BOLA/IDOR) via tenant scoping.
+- **Request Inspection and Response DLP**: Detects adversarial input indicators and exfiltration attempts, recursively redacting sensitive egress data (SSNs, credit cards, credentials) with fail-closed semantics.
+- **Tamper-Evident Audit Logging**: Cryptographically hash-chains all security decisions in an append-only store with SQLite tamper-prevention triggers.
+- **Reproducible Security Evaluation**: Runs an automated 16-scenario adversarial evaluation battery measuring block rates, false rejection rates, and chain integrity.
+- **Local-Only Mock Backend and Synthetic Demonstration Data**: Fully runnable without paid APIs, cloud services, external credentials, or model downloads.
 
 > **Status:** Phase 5 Complete — Docker Containerization, CI/CD, Terminal Dashboard & Release Readiness
 > **Cost & Dependencies:** 100% Free, local-only, zero cloud subscriptions, zero external model calls.
@@ -255,7 +266,7 @@ ADV-12     | Audit Integrity    | PASS   | 29.8ms   | Tamper-evident hash chain 
 > 2. **Finite Test Set Disclosure**: A 100% block rate on the evaluation suite indicates that the proxy blocks all attacks in the defined test set. It does **not** prove universal immunity against all prompt injection attacks, multi-turn conversational jailbreaks, or novel exfiltration techniques.
 > 3. **Heuristic vs. Semantic Inspection**: Regular expression pattern matching on ingress notes catches known override indicators and delimiter injections with zero latency overhead, but can be bypassed by creative semantic paraphrasing. In enterprise architectures, regex heuristic filters should be paired with specialized semantic classifier microservices and fine-grained parameter schema constraints.
 > 4. **Demonstration Credentials**: The Bearer tokens in `src/security/identity.py` and the internal service key in `.env.example` are synthetic demonstration secrets for local testing. They must never be used in production.
-> 5. **Docker Verification Disclosure**: Container configurations (`Dockerfile`, `docker-compose.yml`) are verified syntactically and built in GitHub Actions CI (`ubuntu-latest` with Docker Buildx). Host image building was marked `NOT RUN` during local audits on machines lacking a local Docker engine.
+> 5. **Docker Verification Disclosure**: Container configurations (`Dockerfile`, `docker-compose.yml`) are verified syntactically and built in GitHub Actions CI (`ubuntu-24.04` with Docker Buildx). Host image building was marked `NOT RUN` during local audits on machines lacking a local Docker engine.
 
 ---
 
