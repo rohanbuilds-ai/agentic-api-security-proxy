@@ -1,0 +1,73 @@
+﻿name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Enforce least-privilege permissions for GitHub Actions token
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test & Security Evaluation (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Pytest Suite
+        run: |
+          pytest -v
+
+      - name: Run Deterministic Security Evaluation Runner
+        run: |
+          python scripts/evaluate_security.py --output ci_evaluation_report.json --audit-db ci_audit.db
+
+      - name: Verify Tamper-Evident Audit Chain Integrity
+        run: |
+          python scripts/verify_audit.py --db ci_audit.db --min-events 14
+
+      - name: Upload Evaluation Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report-py${{ matrix.python-version }}
+          path: ci_evaluation_report.json
+          retention-days: 7
+
+  docker-validate:
+    name: Docker Configuration & Image Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config
+
+      - name: Verify Docker Compose Build
+        run: |
+          docker compose build

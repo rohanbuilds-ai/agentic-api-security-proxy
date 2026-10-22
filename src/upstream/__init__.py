@@ -1,0 +1,1 @@
+﻿"""Mock upstream service package."""

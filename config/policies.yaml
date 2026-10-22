@@ -1,0 +1,31 @@
+﻿# Agentic API Security Proxy - Deterministic RBAC Policies
+#
+# SECURITY RULES:
+# 1. No wildcards ('*') are permitted.
+# 2. Deny by default: Any action not explicitly listed under a role is denied (403 Forbidden).
+# 3. Missing or unconfigured roles are strictly denied.
+# 4. Actions must correspond strictly to supported system operations.
+
+roles:
+  readonly_analyst:
+    description: "Read-only analytics agent with read permissions on tenant data."
+    allowed_actions:
+      - "get_order_details"
+
+  support_rep:
+    description: "Customer support agent authorized to view details and create orders within tenant."
+    allowed_actions:
+      - "get_order_details"
+      - "create_order"
+
+  billing_agent:
+    description: "Billing workflows agent with order inspection and invoice adjustment capabilities."
+    allowed_actions:
+      - "get_order_details"
+      - "create_order"
+
+  admin_agent:
+    description: "Administrative agent with full operational permissions constrained to its assigned tenant."
+    allowed_actions:
+      - "get_order_details"
+      - "create_order"

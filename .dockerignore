@@ -1,0 +1,35 @@
+﻿# Virtual environments and dependencies
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and runtime state
+*.db
+*.sqlite3
+*.log
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Evaluation and test outputs
+evaluation_report.json
+ci_evaluation_report.json
+
+# Version control and IDE artifacts
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

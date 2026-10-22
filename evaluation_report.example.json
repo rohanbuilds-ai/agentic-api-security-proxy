@@ -1,0 +1,182 @@
+﻿{
+  "evaluation_timestamp_utc": "2026-01-15T12:00:00Z",
+  "evaluation_database": "eval_audit_sample.db",
+  "summary_metrics": {
+    "total_scenarios": 16,
+    "passed_scenarios": 16,
+    "failed_scenarios": 0,
+    "outcome_match_rate_pct": 100.0,
+    "attack_case_block_rate_pct": 100.0,
+    "benign_false_rejection_rate_pct": 0.0,
+    "audit_chain_verified": true,
+    "audit_chain_total_events": 14
+  },
+  "latency_metrics_ms": {
+    "samples_count": 16,
+    "mean_latency_ms": 9.27,
+    "median_latency_ms": 6.07,
+    "p95_latency_ms": 32.79
+  },
+  "scenarios": [
+    {
+      "case_id": "BENIGN-01",
+      "category": "Authorization",
+      "description": "Authorized support rep reads order in own tenant (tenant-alpha)",
+      "expected_outcome": "HTTP 200, status=SUCCESS",
+      "actual_outcome": "HTTP 200, status=SUCCESS",
+      "status": "PASS",
+      "latency_ms": 32.3,
+      "detail": null
+    },
+    {
+      "case_id": "BENIGN-02",
+      "category": "Operation",
+      "description": "Authorized agent creates order within permitted parameter bounds",
+      "expected_outcome": "HTTP 200, status=SUCCESS",
+      "actual_outcome": "HTTP 200, status=SUCCESS",
+      "status": "PASS",
+      "latency_ms": 9.6,
+      "detail": null
+    },
+    {
+      "case_id": "BENIGN-03",
+      "category": "Heuristic Accuracy",
+      "description": "Ordinary business text containing 'system', 'secret', 'delete' is not falsely blocked",
+      "expected_outcome": "HTTP 200, status=SUCCESS (No false positive)",
+      "actual_outcome": "HTTP 200, status=SUCCESS",
+      "status": "PASS",
+      "latency_ms": 8.2,
+      "detail": null
+    },
+    {
+      "case_id": "BENIGN-04",
+      "category": "RBAC",
+      "description": "Admin agent successfully accesses tenant resource",
+      "expected_outcome": "HTTP 200, status=SUCCESS",
+      "actual_outcome": "HTTP 200, status=SUCCESS",
+      "status": "PASS",
+      "latency_ms": 8.5,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-01",
+      "category": "Authentication",
+      "description": "Unauthenticated request rejected with HTTP 401",
+      "expected_outcome": "HTTP 401, error=ERR_MISSING_CREDENTIALS",
+      "actual_outcome": "HTTP 401, error=ERR_MISSING_CREDENTIALS",
+      "status": "PASS",
+      "latency_ms": 5.0,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-02",
+      "category": "Authentication",
+      "description": "Invalid token rejected with HTTP 401",
+      "expected_outcome": "HTTP 401, error=ERR_INVALID_CREDENTIALS",
+      "actual_outcome": "HTTP 401, error=ERR_INVALID_CREDENTIALS",
+      "status": "PASS",
+      "latency_ms": 4.7,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-03",
+      "category": "RBAC",
+      "description": "Readonly analyst blocked from creating orders",
+      "expected_outcome": "HTTP 403, error=ERR_RBAC_FORBIDDEN",
+      "actual_outcome": "HTTP 403, error=ERR_RBAC_FORBIDDEN",
+      "status": "PASS",
+      "latency_ms": 6.5,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-04",
+      "category": "Authorization",
+      "description": "Cross-tenant access attempt (BOLA/IDOR) blocked with 403",
+      "expected_outcome": "HTTP 403, error=ERR_BOLA_VIOLATION",
+      "actual_outcome": "HTTP 403, error=ERR_BOLA_VIOLATION",
+      "status": "PASS",
+      "latency_ms": 6.2,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-05",
+      "category": "Identity Isolation",
+      "description": "Client body claims cannot elevate privileges; blocked by authenticated role",
+      "expected_outcome": "HTTP 403, error=ERR_RBAC_FORBIDDEN",
+      "actual_outcome": "HTTP 403, error=ERR_RBAC_FORBIDDEN",
+      "status": "PASS",
+      "latency_ms": 5.8,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-06",
+      "category": "Input Safety",
+      "description": "Adversarial instruction override pattern blocked before forwarding",
+      "expected_outcome": "HTTP 403, rule_id=INPUT_INSTRUCTION_OVERRIDE",
+      "actual_outcome": "HTTP 403, rule_id=INPUT_INSTRUCTION_OVERRIDE",
+      "status": "PASS",
+      "latency_ms": 6.0,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-07",
+      "category": "Input Safety",
+      "description": "Explicit security bypass request blocked before forwarding",
+      "expected_outcome": "HTTP 403, rule_id=INPUT_SECURITY_BYPASS",
+      "actual_outcome": "HTTP 403, rule_id=INPUT_SECURITY_BYPASS",
+      "status": "PASS",
+      "latency_ms": 5.0,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-08",
+      "category": "Input Safety",
+      "description": "Data exfiltration instruction blocked before forwarding",
+      "expected_outcome": "HTTP 403, rule_id=INPUT_DATA_EXFILTRATION",
+      "actual_outcome": "HTTP 403, rule_id=INPUT_DATA_EXFILTRATION",
+      "status": "PASS",
+      "latency_ms": 6.1,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-09",
+      "category": "Perimeter Protection",
+      "description": "Direct upstream microservice access without internal service key rejected",
+      "expected_outcome": "HTTP 401 Unauthorized",
+      "actual_outcome": "HTTP 401",
+      "status": "PASS",
+      "latency_ms": 0.9,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-10",
+      "category": "Response DLP",
+      "description": "Synthetic SSN and credit card in response redacted before client egress",
+      "expected_outcome": "Raw values masked, count=2, categories=[CREDIT_CARD, SSN]",
+      "actual_outcome": "Raw leaked: False, redactions={'count': 2, 'categories': ['CREDIT_CARD', 'SSN']}",
+      "status": "PASS",
+      "latency_ms": 5.5,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-11",
+      "category": "Fail-Closed Safety",
+      "description": "DLP engine fault withholds response; fails closed with HTTP 502",
+      "expected_outcome": "HTTP 502, error=ERR_DLP_FAILURE, data=None",
+      "actual_outcome": "HTTP 502, error=ERR_DLP_FAILURE, data=None",
+      "status": "PASS",
+      "latency_ms": 5.3,
+      "detail": null
+    },
+    {
+      "case_id": "ADV-12",
+      "category": "Audit Integrity",
+      "description": "Tamper-evident hash chain detects modified event record in historical log",
+      "expected_outcome": "is_valid=False, tampered_index=1",
+      "actual_outcome": "is_valid=False, tampered_index=1",
+      "status": "PASS",
+      "latency_ms": 32.8,
+      "detail": null
+    }
+  ]
+}

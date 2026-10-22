@@ -1,0 +1,75 @@
+﻿services:
+  # ----------------------------------------------------------------------------
+  # Mock Upstream Backend Service (Internal only; port not exposed to host)
+  # ----------------------------------------------------------------------------
+  upstream:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "src.upstream.app"]
+    environment:
+      - UPSTREAM_HOST=0.0.0.0
+      - UPSTREAM_PORT=8001
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-dev-proxy-internal-service-key-998877}
+      - UPSTREAM_DB_PATH=/data/synthetic_upstream.db
+    volumes:
+      - upstream_data:/data
+    networks:
+      - proxy-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  # ----------------------------------------------------------------------------
+  # Agentic API Security Proxy Gateway (Published on loopback 127.0.0.1 only)
+  # ----------------------------------------------------------------------------
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "src.proxy.app"]
+    environment:
+      - PROXY_HOST=0.0.0.0
+      - PROXY_PORT=8000
+      - UPSTREAM_BASE_URL=http://upstream:8001
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-dev-proxy-internal-service-key-998877}
+      - AUDIT_DB_PATH=/data/audit_log.db
+    ports:
+      # Bound strictly to the host loopback interface to prevent public exposure
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - audit_data:/data
+    networks:
+      - proxy-net
+    depends_on:
+      upstream:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes & Isolated Network
+# ------------------------------------------------------------------------------
+volumes:
+  audit_data:
+    name: agentic_proxy_audit_data
+  upstream_data:
+    name: agentic_proxy_upstream_data
+
+networks:
+  proxy-net:
+    driver: bridge
+    name: agentic_proxy_network
